@@ -36,6 +36,17 @@ export default {
 }
 ```
 
+This is the default `index.php`, add an `index.php` in the project root to override. Make sure to define `$shortcode`.
+
+```php
+<?php
+/**
+ * Plugin Name: Svelte Kit Shortcode
+ */
+
+$shortcode = "svelte-kit-shortcode";
+```
+
 ## License
 
 [MIT](LICENSE)
