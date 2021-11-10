@@ -26,13 +26,13 @@ if (production) {
 }
 
 export default {
-	kit: {
+    kit: {
         files: {
             template
         },
         adapter: adapter(),
         paths
-	}
+    }
 }
 ```
 
