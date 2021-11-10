@@ -1,0 +1,23 @@
+{
+    "name": "sveltekit-adapter-wordpress-shortcode",
+    "version": "0.1.0",
+    "description": "Build wordpress shortcode plugins with SvelteKit",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "types": "index.d.ts",
+    "files": [
+        "files",
+        "index.d.ts"
+    ],
+    "license": "MIT",
+    "exports": {
+        ".": {
+            "import": "./index.js"
+        },
+        "./package.json": "./package.json"
+    }
+}
