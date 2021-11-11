@@ -8,17 +8,24 @@ add_shortcode($shortcode, function ($attributes, $content, $shortcode) {
     $id = $attributes["id"] ? $attributes["id"] : $shortcode;
 
 return <<<HTML
-    <template id="{$id}-template">
-    	%svelte.head%
-        %svelte.body%
-    </template>
-    <div id="{$id}-container" data-id="{$id}"></div>
+    <div id="svelte-html">
+        <div id="svelte-body">
+    		<div id="svelte" class="svelte-root">
+                %svelte.body%
+            </div>
+        </div>
+    </div>
     <script>
         (window.__kitShortcodeData ??= []).push({$data})
-        document
-            .querySelector("#{$id}-container")
-            .attachShadow({ mode: "open" })
-            .appendChild(document.querySelector("#{$id}-template").content)
     </script>
 HTML;
 });
+
+add_action("wp_head", function () use ($shortcode) {
+    global $post;
+    if (!has_shortcode($post->post_content, $shortcode)) return;
+    
+    ?>
+        %svelte.head%
+    <?php
+}, 10, 3);
