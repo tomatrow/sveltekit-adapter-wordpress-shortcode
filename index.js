@@ -5,7 +5,7 @@ import { join, resolve } from 'path';
 // @ts-ignore
 const filesPath = fileURLToPath(new URL('./files', import.meta.url))
 
-export const shortcodeTemplate = join(filesPath, "shortcode.php")
+export const shortcodeTemplate = join(filesPath, "shortcode.php.part")
 
 /** @type {import('.')} */
 export default function ({ pages = 'build', assets = pages, fallback = null } = {}) {

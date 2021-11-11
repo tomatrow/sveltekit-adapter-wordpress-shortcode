@@ -1,0 +1,24 @@
+add_shortcode($shortcode, function ($attributes, $content, $shortcode) {
+    $data = json_encode([
+        'attributes' => $attributes,
+        'content' => $content,
+        'shortcode' => $shortcode
+    ]);
+
+    $id = $attributes["id"] ? $attributes["id"] : $shortcode;
+
+return <<<HTML
+    <template id="{$id}-template">
+    	%svelte.head%
+        %svelte.body%
+    </template>
+    <div id="{$id}-container" data-id="{$id}"></div>
+    <script>
+        (window.__kitShortcodeData ??= []).push({$data})
+        document
+            .querySelector("#{$id}-container")
+            .attachShadow({ mode: "open" })
+            .appendChild(document.querySelector("#{$id}-template").content)
+    </script>
+HTML;
+});
