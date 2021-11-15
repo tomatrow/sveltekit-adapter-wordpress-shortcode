@@ -4,7 +4,7 @@
 
 ## Usage
 
-Install with `npm i -D sveltekit-adapter-wordpress-shortcode`, setupt the adapter in `svelte.config.js`, add `index.php` to the project root, and mark the parts of your template you want to include in the shortcode.
+Install with `npm i -D sveltekit-adapter-wordpress-shortcode`, setup the adapter in `svelte.config.js`, add `index.php` to the project root, and mark the parts of your template you want to include in the shortcode.
 
 ### Example `svelte.config.js` 
 
@@ -49,11 +49,11 @@ include plugin_dir_path( __FILE__ ) . 'svelte_kit_shortcode.php';
 svelte_kit_shortcode("svelte-kit-shortcode");
 ```
 
+You can choose the path by setting `indexPath` in the adapter config. 
 
 ### Example `app.html`
 
 Wrap the parts of your template that you want added to the shortcode. 
-
 
 ```html
 <!DOCTYPE html>
@@ -71,6 +71,48 @@ Wrap the parts of your template that you want added to the shortcode.
         <!-- SHORTCODE BODY END -->
 	</body>
 </html>
+```
+
+## Style Isolation
+
+The following sequence of `postcss` plugins should provide enough isolation from Wordpress styles.
+
+Note that `postcss-autoreset` is using the fork at `tomatrow/postcss-autoreset`.
+
+```js
+const autoprefixer = require('autoprefixer');
+const cssnano = require('cssnano');
+const safeImportant = require('postcss-safe-important');
+const prefixer = require('postcss-prefix-selector')
+const initial = require('postcss-initial')
+const autoReset = require('postcss-autoreset')
+
+const mode = process.env.NODE_ENV;
+const dev = mode === 'development';
+
+const config = {
+	plugins: [
+        autoReset({ reset: "revert" }),
+        initial(),
+        prefixer({
+            prefix: "#svelte",
+            transform: function (_, selector, prefixedSelector) {
+                if (["html", "body"].includes(selector)) 
+                    return `${selector} #svelte`
+                else 
+                    return prefixedSelector
+            }
+        }),
+		autoprefixer(),
+        safeImportant(),
+		!dev &&
+			cssnano({
+				preset: 'default'
+			})
+	]
+};
+
+module.exports = config;
 ```
 
 ## License
