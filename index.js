@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url'
 import { join, resolve } from 'path'
 
 /** @type {import('.')} */
-export default function ({ pages = 'build', assets = pages, fallback = null, indexPath = "index.php" } = {}) {
+export default function ({ pages = 'build', assets = pages, fallback = null, indexPath = "index.php", shortcode = "svelte-kit-shortcode" } = {}) {
 	return {
 		name: '@sveltejs/adapter-wordpress-shortcode',
 
@@ -26,7 +26,7 @@ export default function ({ pages = 'build', assets = pages, fallback = null, ind
             const content = readFileSync(indexPath, 'utf8')
             writeFileSync(resolve(pages, "index.php"), content)
 
-            // read index.html
+            // read and remove index.html
             const indexHtmlPath = resolve(pages, "index.html")
             /** @type {string} */
             const indexHtml = readFileSync(indexHtmlPath, "utf8")
@@ -37,6 +37,7 @@ export default function ({ pages = 'build', assets = pages, fallback = null, ind
             /** @type {string} */
             const shortcodeTemplate = readFileSync(join(fileURLToPath(new URL('./files', import.meta.url)), shortcodePath), "utf-8")
             const filledTemplate = shortcodeTemplate
+                .replaceAll("%shortcode.code%", shortcode)
                 .replace("%shortcode.head%", scan("head", indexHtml))
                 .replace("%shortcode.body%", scan("body", indexHtml))
             writeFileSync(resolve(pages, shortcodePath), filledTemplate)

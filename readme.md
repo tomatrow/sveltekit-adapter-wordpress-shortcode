@@ -8,7 +8,7 @@ Install with `npm i -D sveltekit-adapter-wordpress-shortcode`, setup the adapter
 
 ### Example `svelte.config.js` 
 
-It's likely you will need to set custom base paths for wordpress. e.g.
+Note: It's likely you will need to set custom base paths for Wordpress.
 
 ```js
 // svelte.config.js
@@ -36,46 +36,69 @@ export default {
 
 ### Example `index.php`
 
-Add an `index.php` to the root of your project and customize accordingly. e.g.
+Note: You can choose the path by setting `indexPath` in the adapter config. 
 
 ```php
+<!-- index.php -->
 <?php
 /**
- * Plugin Name: Svelte Kit Shortcode
+ * Plugin Name: My Shortcode
  */
 
 include plugin_dir_path( __FILE__ ) . 'svelte_kit_shortcode.php';
 
-svelte_kit_shortcode("svelte-kit-shortcode");
+svelte_kit_shortcode("my-shortcode");
+?>
 ```
-
-You can choose the path by setting `indexPath` in the adapter config. 
 
 ### Example `app.html`
 
 Wrap the parts of your template that you want added to the shortcode. 
 
 ```html
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <!-- SHORTCODE HEAD START -->
-		%svelte.head%
+        %svelte.head%
         <!-- SHORTCODE HEAD END -->
-	</head>
-	<body>
+    </head>
+    <body>
         <!-- SHORTCODE BODY START -->
         <div id="svelte">%svelte.body%</div>
         <!-- SHORTCODE BODY END -->
-	</body>
+    </body>
 </html>
+```
+
+### Passing attributes and content
+
+Both are inserted right before the svelte kit body.
+
+```html
+[my-shortcode attribute-a attribute-b attribute-c]
+    <a href="/">Home</a>
+[/my-shortcode]
+```
+
+becomes
+
+```html
+<script id="my-shortcode-attributes" type="application/json">
+    ["attribute-a", "attribute-b", "attribute-c"]
+</script>
+<template id="my-shortcode-content">
+    <a href="/">Home</a>
+</template>
+<!-- svelte kit body stuff -->
 ```
 
 ## Style Isolation
 
-The following sequence of `postcss` plugins should provide enough isolation from Wordpress styles.
+The following configuration of `postcss` plugins should provide enough isolation from Wordpress styles.
 
 Note that `postcss-autoreset` is using the fork at `tomatrow/postcss-autoreset`.
 
@@ -96,11 +119,10 @@ const config = {
         initial(),
         prefixer({
             prefix: "#svelte",
-            transform: function (_, selector, prefixedSelector) {
-                if (["html", "body"].includes(selector)) 
-                    return `${selector} #svelte`
-                else 
-                    return prefixedSelector
+            transform(prefix, selector, prefixedSelector) {
+                return ["html", "body"].includes(selector) 
+                    ? `${selector} ${prefix}`
+                    : prefixedSelector
             }
         }),
 		autoprefixer(),

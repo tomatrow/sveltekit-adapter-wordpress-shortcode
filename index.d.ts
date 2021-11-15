@@ -5,6 +5,7 @@ interface AdapterOptions {
     assets?: string;
     fallback?: string;
     indexPath?: string;
+    shortcode?: string;
 }
 
 declare function plugin(options?: AdapterOptions): Adapter;
