@@ -1,14 +1,9 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { join, resolve } from 'path';
-
-// @ts-ignore
-const filesPath = fileURLToPath(new URL('./files', import.meta.url))
-
-export const shortcodeTemplate = join(filesPath, "shortcode.php.part")
+import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { fileURLToPath } from 'url'
+import { join, resolve } from 'path'
 
 /** @type {import('.')} */
-export default function ({ pages = 'build', assets = pages, fallback = null } = {}) {
+export default function ({ pages = 'build', assets = pages, fallback = null, indexPath = "index.php" } = {}) {
 	return {
 		name: '@sveltejs/adapter-wordpress-shortcode',
 
@@ -25,19 +20,43 @@ export default function ({ pages = 'build', assets = pages, fallback = null } = 
 				dest: pages
 			})
 
+            // copy index.php
+            if (!existsSync(indexPath))
+                throw new Error("No plugin index at " + indexPath)
+            const content = readFileSync(indexPath, 'utf8')
+            writeFileSync(resolve(pages, "index.php"), content)
+
+            // read index.html
             const indexHtmlPath = resolve(pages, "index.html")
-            const template = readFileSync(indexHtmlPath, "utf-8")
-            
-            const userPluginIndexPath = "index.php"
-
-            const resolvedPluginIndexPath = existsSync(userPluginIndexPath) ? userPluginIndexPath : join(filesPath, "index.php")
-            
-            const pluginIndex = readFileSync(resolvedPluginIndexPath, "utf-8")
-            
-            writeFileSync(resolve(pages, "index.php"), pluginIndex + "\n" + template)
-
+            /** @type {string} */
+            const indexHtml = readFileSync(indexHtmlPath, "utf8")
             utils.rimraf(indexHtmlPath)
+
+            // fill in shortcode template
+            const shortcodePath = "svelte_kit_shortcode.php"
+            /** @type {string} */
+            const shortcodeTemplate = readFileSync(join(fileURLToPath(new URL('./files', import.meta.url)), shortcodePath), "utf-8")
+            const filledTemplate = shortcodeTemplate
+                .replace("%shortcode.head%", scan("head", indexHtml))
+                .replace("%shortcode.body%", scan("body", indexHtml))
+            writeFileSync(resolve(pages, shortcodePath), filledTemplate)
 		}
-	};
+	}
 }
 
+/** 
+* @param {"head"|"body"} segment
+* @param {string} indexHtml
+*/
+function scan(segment, indexHtml) {
+    const literal = segment.toUpperCase()
+    const start = `<!-- SHORTCODE ${literal} START -->`
+    const end = `<!-- SHORTCODE ${literal} END -->`
+
+    const matches = indexHtml.match(new RegExp(start + ".+?" + end, "gms"))
+    const part = matches?.[0]
+    
+    if (!part) throw new Error(`Could not find ${segment}`)
+    
+    return part
+}

@@ -4,9 +4,8 @@ interface AdapterOptions {
 	pages?: string;
     assets?: string;
     fallback?: string;
+    indexPath?: string;
 }
-
-export const shortcodeTemplate: string
 
 declare function plugin(options?: AdapterOptions): Adapter;
 export = plugin;

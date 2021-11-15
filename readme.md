@@ -4,39 +4,39 @@
 
 ## Usage
 
-Install with `npm i -D sveltekit-adapter-wordpress-shortcode`, then add the adapter to your `svelte.config.js`, and set the kit template to `shortcodeTemplate` in production. It's likely you will need to set custom base paths for production also.
+Install with `npm i -D sveltekit-adapter-wordpress-shortcode`, setupt the adapter in `svelte.config.js`, add `index.php` to the project root, and mark the parts of your template you want to include in the shortcode.
+
+### Example `svelte.config.js` 
+
+It's likely you will need to set custom base paths for wordpress. e.g.
 
 ```js
 // svelte.config.js
-import adapter, { shortcodeTemplate } from 'sveltekit-adapter-wordpress-shortcode';
+import adapter from 'sveltekit-adapter-wordpress-shortcode'
 
 const production = process.env.NODE_ENV === "production"
 
-/** @type {import('@sveltejs/kit').Config["kit"]["paths"]} */
-let paths 
-/** @type {import('@sveltejs/kit').Config["kit"]["files"]["template"]} */
-let template 
-if (production) {
-    const base = "/wp-content/plugins/svelte-kit-shortcode-plugin"
-    paths = {
-        base,
-        assets: process.env.VITE_BASE_URL + base
-    }
-    template = shortcodeTemplate
-}
+const base = "/wp-content/plugins/my-shortcode-plugin"
 
 export default {
     kit: {
-        files: {
-            template
-        },
-        adapter: adapter(),
-        paths
+        adapter: adapter({
+            pages: "build",
+            assets: "build",
+            fallback: null,
+            indexPath: "index.php"
+        }),
+        paths: production && {
+            base,
+            assets: "https://example.com" + base
+        }
     }
 }
 ```
 
-This is the default `index.php`, add an `index.php` in the project root to override. Make sure to define `$shortcode`.
+### Example `index.php`
+
+Add an `index.php` to the root of your project and customize accordingly. e.g.
 
 ```php
 <?php
@@ -44,7 +44,33 @@ This is the default `index.php`, add an `index.php` in the project root to overr
  * Plugin Name: Svelte Kit Shortcode
  */
 
-$shortcode = "svelte-kit-shortcode";
+include plugin_dir_path( __FILE__ ) . 'svelte_kit_shortcode.php';
+
+svelte_kit_shortcode("svelte-kit-shortcode");
+```
+
+
+### Example `app.html`
+
+Wrap the parts of your template that you want added to the shortcode. 
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!-- SHORTCODE HEAD START -->
+		%svelte.head%
+        <!-- SHORTCODE HEAD END -->
+	</head>
+	<body>
+        <!-- SHORTCODE BODY START -->
+        <div id="svelte">%svelte.body%</div>
+        <!-- SHORTCODE BODY END -->
+	</body>
+</html>
 ```
 
 ## License
