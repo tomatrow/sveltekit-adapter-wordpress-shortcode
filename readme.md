@@ -16,22 +16,29 @@ import adapter from 'sveltekit-adapter-wordpress-shortcode'
 
 const production = process.env.NODE_ENV === "production"
 
-const base = "/wp-content/plugins/my-shortcode-plugin"
-
-export default {
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
     kit: {
         adapter: adapter({
             pages: "build",
             assets: "build",
             fallback: null,
-            indexPath: "index.php"
-        }),
-        paths: production && {
-            base,
-            assets: "https://example.com" + base
-        }
+            indexPath: "index.php",
+            shadow: false,
+            shortcode: "svelte-kit-shortcode"
+        })
     }
 }
+
+if (production) {
+    const base = "/wp-content/plugins/my-shortcode-plugin"
+    config.kit.paths = {
+        base,
+        assets: "https://example.com" + base
+    }
+}
+
+export default config
 ```
 
 ### Example `index.php`
