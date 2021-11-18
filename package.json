@@ -4,10 +4,7 @@
     "description": "Build wordpress shortcode plugins with SvelteKit",
     "main": "index.js",
     "type": "module",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "",
+    "author": "AJ Caldwell <tomatrow@gmail.com>",
     "types": "index.d.ts",
     "files": [
         "files",
