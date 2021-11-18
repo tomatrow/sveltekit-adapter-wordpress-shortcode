@@ -48,8 +48,9 @@ export default function ({
             const filledTemplate = shortcodeTemplate
                 .replaceAll("%shortcode.code%", shortcode)
                 .replaceAll("%shortcode.shadow%", shadow)
-                .replace("%shortcode.head%", scan("head", indexHtml))
-                .replace("%shortcode.body%", scan("body", indexHtml))
+            
+            writeFileSync(resolve(pages, "svelte_kit_shortcode_head.html"), scan("head", indexHtml))
+            writeFileSync(resolve(pages, "svelte_kit_shortcode_body.html"), scan("body", indexHtml))
             writeFileSync(resolve(pages, shortcodePath), filledTemplate)
         }
     }

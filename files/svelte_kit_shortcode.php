@@ -1,15 +1,11 @@
 <?php
 
 function shortcodeHead() {
-    return <<<HTML
-        %shortcode.head%
-    HTML;
+    return file_get_contents(plugin_dir_path( __FILE__ ) . "svelte_kit_shortcode_head.html");
 }
 
 function shortcodeBody() {
-    return <<<HTML
-        %shortcode.body%
-    HTML;
+    return file_get_contents(plugin_dir_path( __FILE__ ) . "svelte_kit_shortcode_body.html");
 }
 
 function shortcodeData($attributes, $content) {
@@ -48,8 +44,11 @@ function svelte_kit_shortcode_add($attributes, $content) {
 add_shortcode("%shortcode.code%", "svelte_kit_shortcode_add");
 
 function svelte_kit_shortcode_head() {
+    if (%shortcode.shadow%) return;
+
     global $post;
-    if (!has_shortcode($post->post_content, "%shortcode.code%") || %shortcode.shadow%) return;
+    if (!has_shortcode($post->post_content, "%shortcode.code%")) return;
+
     echo shortcodeHead();
 }
 add_action("wp_head", "svelte_kit_shortcode_head");
