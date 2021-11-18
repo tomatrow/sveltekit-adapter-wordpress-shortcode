@@ -1,6 +1,6 @@
 {
     "name": "sveltekit-adapter-wordpress-shortcode",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Build wordpress shortcode plugins with SvelteKit",
     "main": "index.js",
     "type": "module",
