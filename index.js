@@ -1,74 +1,71 @@
-import { readFileSync, writeFileSync, existsSync } from "fs"
 import { fileURLToPath } from "url"
-import { join, resolve } from "path"
+import { readFileSync, writeFileSync } from "fs"
+import { resolve } from "path"
+import { JSDOM } from "jsdom"
+
+const files = fileURLToPath(new URL('./files', import.meta.url).href);
 
 /** @type {import('.')} */
 export default function ({
-    pages = "build",
-    assets = pages,
-    fallback = null,
-    indexPath = "index.php",
-    shadow = false,
-    shortcode = "svelte-kit-shortcode"
+	pages = "build",
+	assets = pages,
+	fallback = null,
+	indexPath = "index.php",
+	shadow = false,
+	shortcode = "svelte-kit-shortcode",
+	renderHead = head => 
+		[...head.querySelectorAll(`link[rel="modulepreload"]`)]
+			.map(element => element.outerHTML)
+			.join("")
+	,
+	renderBody = body => body.innerHTML
 } = {}) {
-    return {
-        name: "@sveltejs/adapter-wordpress-shortcode",
+	return {
+		name: "@sveltejs/adapter-wordpress-shortcode",
 
-        async adapt({ utils }) {
-            utils.rimraf(assets)
-            utils.rimraf(pages)
+		async adapt(builder) {
+			if (!fallback && !builder.config.kit.prerender.default) 
+				builder.log.warn(
+					'You should set `config.kit.prerender.default` to `true` if no fallback is specified'
+				)
 
-            utils.copy_static_files(assets)
-            utils.copy_client_files(assets)
+			if (!builder.config.kit.paths.base)
+				builder.log.warn(
+					"You should set config.kit.paths.base to something like `/wp-content/plugins/my-shortcode-plugin`"
+				)
+			
+			if (!builder.config.kit.paths.assets)
+				builder.log.warn(
+					"You should set config.kit.paths.assets to something like `https://example.com/wp-content/plugins/my-shortcode-plugin`"
+				)
 
-            await utils.prerender({
-                fallback,
-                all: !fallback,
-                dest: pages
-            })
+			builder.rimraf(assets)
+			builder.rimraf(pages)
 
-            // copy index.php
-            if (!existsSync(indexPath)) throw new Error("No plugin index at " + indexPath)
-            const content = readFileSync(indexPath, "utf8")
-            writeFileSync(resolve(pages, "index.php"), content)
+			builder.writeStatic(assets)
+			builder.writeClient(assets)
+			builder.writePrerendered(pages, { fallback })
 
-            // read and remove index.html
-            const indexHtmlPath = resolve(pages, "index.html")
-            /** @type {string} */
-            const indexHtml = readFileSync(indexHtmlPath, "utf8")
-            utils.rimraf(indexHtmlPath)
+			// copy php files
+			builder.copy(indexPath, resolve(pages, "index.php"))
+			builder.copy(files, pages, {
+				replace: {
+					"%shortcode.code%": shortcode,
+					"%shortcode.shadow%": shadow
+				}
+			})
 
-            // fill in shortcode template
-            const shortcodePath = "svelte_kit_shortcode.php"
-            /** @type {string} */
-            const shortcodeTemplate = readFileSync(
-                join(fileURLToPath(new URL("./files", import.meta.url)), shortcodePath),
-                "utf-8"
-            )
-            const filledTemplate = shortcodeTemplate
-                .replaceAll("%shortcode.code%", shortcode)
-                .replaceAll("%shortcode.shadow%", shadow)
-            
-            writeFileSync(resolve(pages, "svelte_kit_shortcode_head.html"), scan("head", indexHtml))
-            writeFileSync(resolve(pages, "svelte_kit_shortcode_body.html"), scan("body", indexHtml))
-            writeFileSync(resolve(pages, shortcodePath), filledTemplate)
-        }
-    }
-}
+			// read, remove, and transform index.html
+			const indexHtmlPath = resolve(pages, "index.html")
+			const dom = new JSDOM(readFileSync(indexHtmlPath, "utf8"))
+			builder.rimraf(indexHtmlPath)
+			writeFileSync(resolve(pages, "svelte_kit_shortcode_head.html"), renderHead(dom.window.document.head))
+			writeFileSync(resolve(pages, "svelte_kit_shortcode_body.html"), renderBody(dom.window.document.body))
 
-/**
- * @param {"head"|"body"} segment
- * @param {string} indexHtml
- */
-function scan(segment, indexHtml) {
-    const literal = segment.toUpperCase()
-    const start = `<!-- SHORTCODE ${literal} START -->`
-    const end = `<!-- SHORTCODE ${literal} END -->`
-
-    const matches = indexHtml.match(new RegExp(start + ".+?" + end, "gms"))
-    const part = matches?.[0]
-
-    if (!part) throw new Error(`Could not find ${segment}`)
-
-    return part
+			if (pages === assets) 
+				builder.log(`Wrote site to "${pages}"`)
+			 else 
+				builder.log(`Wrote pages to "${pages}" and assets to "${assets}"`)
+		}
+	}
 }

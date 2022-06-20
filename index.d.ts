@@ -7,6 +7,8 @@ interface AdapterOptions {
     indexPath?: string
     shortcode?: string
     shadow?: boolean
+	renderHead?: (head: HTMLHeadElement) => string,
+	renderBody?: (head: HTMLBodyElement) => string
 }
 
 declare function plugin(options?: AdapterOptions): Adapter
