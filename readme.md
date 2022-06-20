@@ -14,8 +14,6 @@ Note: It's likely you will need to set custom base paths for Wordpress.
 // svelte.config.js
 import adapter from "sveltekit-adapter-wordpress-shortcode"
 
-const production = process.env.NODE_ENV === "production"
-
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     kit: {
@@ -26,12 +24,19 @@ const config = {
             fallback: null,
             indexPath: "index.php",
             shadow: false,
-            shortcode: "svelte-kit-shortcode"
+            shortcode: "svelte-kit-shortcode",
+			renderHead: head => 
+				[...head.querySelectorAll(`link[rel="modulepreload"]`)]
+					.map(element => element.outerHTML)
+					.join("")
+			,
+			renderBody: body => body.innerHTML
         })
     }
 }
 
-if (production) {
+// handle wordpress url structure 
+if (process.env.NODE_ENV === "production") {
     const base = "/wp-content/plugins/my-shortcode-plugin"
     config.kit.paths = {
         base,
@@ -55,29 +60,6 @@ Note: You can choose the path by setting `indexPath` in the adapter config.
 
 include plugin_dir_path( __FILE__ ) . 'svelte_kit_shortcode.php';
 ?>
-```
-
-### Example `app.html`
-
-Wrap the parts of your template that you want added to the shortcode.
-
-```html
-<!-- index.html -->
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <!-- SHORTCODE HEAD START -->
-        %svelte.head%
-        <!-- SHORTCODE HEAD END -->
-    </head>
-    <body>
-        <!-- SHORTCODE BODY START -->
-        <div id="svelte">%svelte.body%</div>
-        <!-- SHORTCODE BODY END -->
-    </body>
-</html>
 ```
 
 ### Passing attributes and content
