@@ -50,8 +50,8 @@ export default function ({
 			builder.copy(indexPath, resolve(pages, "index.php"))
 			builder.copy(files, pages, {
 				replace: {
-					"%shortcode.code%": shortcode,
-					"%shortcode.shadow%": shadow
+					SHORTCODE_CODE: shortcode,
+					SHORTCODE_SHADOW: String(shadow)
 				}
 			})
 
