@@ -1,25 +1,25 @@
 {
-    "name": "sveltekit-adapter-wordpress-shortcode",
-    "version": "0.3.0",
-    "description": "Build wordpress shortcode plugins with SvelteKit",
-    "main": "index.js",
-    "type": "module",
-    "author": "AJ Caldwell <tomatrow@gmail.com>",
-    "types": "index.d.ts",
-    "files": [
-        "files",
-        "index.d.ts"
-    ],
-    "license": "MIT",
-    "exports": {
-        ".": {
-            "import": "./index.js"
-        },
-        "./package.json": "./package.json"
-    },
-    "devDependencies": {
-        "@sveltejs/kit": "1.0.0-next.484",
-        "@types/jsdom": "^20.0.0",
-        "jsdom": "^20.0.0"
-    }
+	"name": "sveltekit-adapter-wordpress-shortcode",
+	"version": "0.3.0",
+	"description": "Build wordpress shortcode plugins with SvelteKit",
+	"main": "index.js",
+	"type": "module",
+	"author": "AJ Caldwell <tomatrow@gmail.com>",
+	"types": "index.d.ts",
+	"files": [
+		"files",
+		"index.d.ts"
+	],
+	"license": "MIT",
+	"exports": {
+		".": {
+			"import": "./index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"devDependencies": {
+		"@sveltejs/kit": "1.0.0-next.484",
+		"@types/jsdom": "^20.0.0",
+		"jsdom": "^20.0.0"
+	}
 }

@@ -16,32 +16,31 @@ import adapter from "sveltekit-adapter-wordpress-shortcode"
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-    kit: {
-        // all the default options
-        adapter: adapter({
-            pages: "build",
-            assets: "build",
-            fallback: null,
-            indexPath: "index.php",
-            shadow: false,
-            shortcode: "svelte-kit-shortcode",
-			renderHead: head => 
+	kit: {
+		// all the default options
+		adapter: adapter({
+			pages: "build",
+			assets: "build",
+			fallback: null,
+			indexPath: "index.php",
+			shadow: false,
+			shortcode: "svelte-kit-shortcode",
+			renderHead: head =>
 				[...head.querySelectorAll(`link[rel="modulepreload"]`)]
 					.map(element => element.outerHTML)
-					.join("")
-			,
+					.join(""),
 			renderBody: body => body.innerHTML
-        })
-    }
+		})
+	}
 }
 
-// handle wordpress url structure 
+// handle wordpress url structure
 if (process.env.NODE_ENV === "production") {
-    const base = "/wp-content/plugins/my-shortcode-plugin"
-    config.kit.paths = {
-        base,
-        assets: "https://example.com" + base
-    }
+	const base = "/wp-content/plugins/my-shortcode-plugin"
+	config.kit.paths = {
+		base,
+		assets: "https://example.com" + base
+	}
 }
 
 export default config
@@ -76,10 +75,10 @@ becomes
 
 ```html
 <script id="my-shortcode-attributes" type="application/json">
-    ["attribute-a", "attribute-b", "attribute-c"]
+	["attribute-a", "attribute-b", "attribute-c"]
 </script>
 <template id="my-shortcode-content">
-    <a href="/">Home</a>
+	<a href="/">Home</a>
 </template>
 <!-- svelte kit body stuff -->
 ```
@@ -108,24 +107,22 @@ const mode = process.env.NODE_ENV
 const dev = mode === "development"
 
 const config = {
-    plugins: [
-        autoReset({ reset: "revert" }),
-        initial(),
-        prefixer({
-            prefix: "#svelte",
-            transform(prefix, selector, prefixedSelector) {
-                return ["html", "body"].includes(selector)
-                    ? `${selector} ${prefix}`
-                    : prefixedSelector
-            }
-        }),
-        autoprefixer(),
-        safeImportant(),
-        !dev &&
-            cssnano({
-                preset: "default"
-            })
-    ]
+	plugins: [
+		autoReset({ reset: "revert" }),
+		initial(),
+		prefixer({
+			prefix: "#svelte",
+			transform(prefix, selector, prefixedSelector) {
+				return ["html", "body"].includes(selector) ? `${selector} ${prefix}` : prefixedSelector
+			}
+		}),
+		autoprefixer(),
+		safeImportant(),
+		!dev &&
+			cssnano({
+				preset: "default"
+			})
+	]
 }
 
 module.exports = config
