@@ -38,10 +38,10 @@ export default function ({
 
 			builder.writeClient(assets)
 			builder.writePrerendered(pages, { fallback })
-			for (const { file } of [...builder.prerendered.pages.values()])
-				if (file !== "index.html") builder.rimraf(resolve(pages, file))
+			const pageFiles = [...builder.prerendered.pages.values()].map(page => page.file)
+			for (const file of pageFiles) if (file !== "index.html") builder.rimraf(resolve(pages, file))
 
-			if (builder.prerendered.pages.get("/")?.file !== "index.html") {
+			if (!pageFiles.includes("index.html")) {
 				builder.log.error(
 					`sveltekit-adapter-wordpress-shortcode: root route must be prerendered (unless using the 'fallback' option — see https://github.com/sveltejs/kit/tree/master/packages/adapter-static#spa-mode). Try adding \`export const prerender = true\` to your root layout.js — see https://kit.svelte.dev/docs/page-options#prerender for more details`
 				)
