@@ -7,10 +7,9 @@ const config = {
 	// for more information about preprocessors
 	preprocess: preprocess(),
 	kit: {
-		adapter: adapter(),
-		prerender: {
-			default: true
-		}
+		adapter: adapter({
+			shortcode: "counter"
+		})
 	}
 }
 

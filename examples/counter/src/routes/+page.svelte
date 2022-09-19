@@ -7,6 +7,7 @@
 		const interval = setInterval(() => counter = counter + 1, 1000)
 		return () => clearInterval(interval)
 	})
+	console.log("Hello")
 </script>
 
 <h1>Welcome to SvelteKit {counter}</h1>
