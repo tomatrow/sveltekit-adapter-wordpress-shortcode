@@ -19,7 +19,9 @@
 	},
 	"devDependencies": {
 		"@sveltejs/kit": "1.0.0-next.484",
-		"@types/jsdom": "^20.0.0",
+		"@types/jsdom": "^20.0.0"
+	},
+	"dependencies": {
 		"jsdom": "^20.0.0"
 	}
 }
