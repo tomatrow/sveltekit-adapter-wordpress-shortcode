@@ -7,6 +7,7 @@ interface AdapterOptions {
 	indexPath?: string
 	shortcode?: string
 	shadow?: boolean
+	prefix?: string
 	renderHead?: (head: HTMLHeadElement) => string
 	renderBody?: (head: HTMLBodyElement) => string
 }

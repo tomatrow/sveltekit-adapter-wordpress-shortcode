@@ -1,14 +1,14 @@
 <?php
 
-function shortcodeHead() {
+function SHORTCODE_PREFIX_shortcodeHead() {
     return file_get_contents(plugin_dir_path( __FILE__ ) . "svelte_kit_shortcode_head.html");
 }
 
-function shortcodeBody() {
+function SHORTCODE_PREFIX_shortcodeBody() {
     return file_get_contents(plugin_dir_path( __FILE__ ) . "svelte_kit_shortcode_body.html");
 }
 
-function shortcodeData($attributes, $content) {
+function SHORTCODE_PREFIX_shortcodeData($attributes, $content) {
     $jsonAttributes = json_encode($attributes);
     return <<<HTML
         <script id="SHORTCODE_CODE-attributes" type="application/json">
@@ -20,11 +20,11 @@ function shortcodeData($attributes, $content) {
     HTML;
 }
 
-function svelte_kit_shortcode_add($attributes, $content) {
-    $injection = shortcodeData($attributes, $content) .  shortcodeBody();
-    
+add_shortcode("SHORTCODE_CODE", function ($attributes, $content) {
+    $injection = SHORTCODE_PREFIX_shortcodeData($attributes, $content) .  SHORTCODE_PREFIX_shortcodeBody();
+
     if (SHORTCODE_SHADOW) {
-        $injection .= shortcodeHead();
+        $injection .= SHORTCODE_PREFIX_shortcodeHead();
         return <<<HTML
             <template id="SHORTCODE_CODE-template">
                 {$injection}
@@ -40,17 +40,15 @@ function svelte_kit_shortcode_add($attributes, $content) {
     } else {
         return $injection;
     }
-}
-add_shortcode("SHORTCODE_CODE", "svelte_kit_shortcode_add");
+});
 
-function svelte_kit_shortcode_head() {
+add_action("wp_head", function () {
     if (SHORTCODE_SHADOW) return;
 
     global $post;
     if (!has_shortcode($post->post_content, "SHORTCODE_CODE")) return;
 
-    echo shortcodeHead();
-}
-add_action("wp_head", "svelte_kit_shortcode_head");
+    echo SHORTCODE_PREFIX_shortcodeHead();
+});
 
 ?>

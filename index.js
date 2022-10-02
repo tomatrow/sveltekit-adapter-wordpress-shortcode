@@ -13,6 +13,7 @@ export default function ({
 	indexPath = "index.php",
 	shadow = false,
 	shortcode = "svelte-kit-shortcode",
+	prefix = "skawpsc_" + shortcode.replace(/[^\w]/g, "_"),
 	renderHead = head =>
 		[...head.querySelectorAll(`link[rel="modulepreload"]`)]
 			.map(element => element.outerHTML)
@@ -54,7 +55,13 @@ export default function ({
 			builder.copy(files, pages, {
 				replace: {
 					SHORTCODE_CODE: shortcode,
-					SHORTCODE_SHADOW: String(shadow)
+					SHORTCODE_SHADOW: String(shadow),
+					...Object.fromEntries(
+						["shortcodeHead", "shortcodeBody", "shortcodeData"].map(funcName => [
+							`SHORTCODE_PREFIX_${funcName}`,
+							`${prefix}_${funcName}`
+						])
+					)
 				}
 			})
 

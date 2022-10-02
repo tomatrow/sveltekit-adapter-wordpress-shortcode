@@ -1,4 +1,4 @@
-# sveltekit-adapter-wordpress-shortcode
+# sveltekit-adapter-wordpress-shortcode (SKAWPSC)
 
 [Adapter](https://kit.svelte.dev/docs#adapters) for SvelteKit which turns your app into a wordpress shortcode.
 
@@ -25,6 +25,7 @@ const config = {
 			indexPath: "index.php",
 			shadow: false,
 			shortcode: "svelte-kit-shortcode",
+			prefix: "skawpsc_svelte_kit_shortcode",
 			renderHead: head =>
 				[...head.querySelectorAll(`link[rel="modulepreload"]`)]
 					.map(element => element.outerHTML)
